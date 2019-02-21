@@ -46,30 +46,33 @@ public class World extends JPanel {
 					continue;
 				}
 				int n = 0;
-				if (i - 1 >= 0 && j - 1 >= 0 && isMine[i - 1][j - 1]) {
-					n++;
+				if (i - 1 >= 0 && i + 1 <= COLS - 1 && j - 1 >= 0 && j + 1 <= ROWS - 1) {
+					if (isMine[i - 1][j - 1]) {
+						n++;
+					}
+					if (isMine[i][j - 1]) {
+						n++;
+					}
+					if (isMine[i + 1][j - 1]) {
+						n++;
+					}
+					if (isMine[i - 1][j]) {
+						n++;
+					}
+					if (isMine[i + 1][j]) {
+						n++;
+					}
+					if (isMine[i - 1][j + 1]) {
+						n++;
+					}
+					if (isMine[i][j + 1]) {
+						n++;
+					}
+					if (isMine[i + 1][j + 1]) {
+						n++;
+					}
 				}
-				if (j - 1 >= 0 && isMine[i][j - 1]) {
-					n++;
-				}
-				if (i + 1 <= COLS - 1 && j - 1 >= 0 && isMine[i + 1][j - 1]) {
-					n++;
-				}
-				if (i - 1 >= 0 && isMine[i - 1][j]) {
-					n++;
-				}
-				if (i + 1 <= COLS - 1 && isMine[i + 1][j]) {
-					n++;
-				}
-				if (i - 1 >= 0 && j + 1 <= ROWS - 1 && isMine[i - 1][j + 1]) {
-					n++;
-				}
-				if (j + 1 <= ROWS - 1 - 1 && isMine[i][j + 1]) {
-					n++;
-				}
-				if (i + 1 <= COLS - 1 && j + 1 <= ROWS - 1 && isMine[i + 1][j + 1]) {
-					n++;
-				}
+				
 				nums[countNum] = new Num(i, j, n);
 				countNum++;
 			}
