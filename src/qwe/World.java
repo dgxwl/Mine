@@ -51,31 +51,29 @@ public class World extends JPanel {
 				}
 				
 				int n = 0;
-				if (i - 1 >= 0 && i + 1 <= COLS - 1 && j - 1 >= 0 && j + 1 <= ROWS - 1) {
-					if (isMine[i - 1][j - 1]) {
-						n++;
-					}
-					if (isMine[i][j - 1]) {
-						n++;
-					}
-					if (isMine[i + 1][j - 1]) {
-						n++;
-					}
-					if (isMine[i - 1][j]) {
-						n++;
-					}
-					if (isMine[i + 1][j]) {
-						n++;
-					}
-					if (isMine[i - 1][j + 1]) {
-						n++;
-					}
-					if (isMine[i][j + 1]) {
-						n++;
-					}
-					if (isMine[i + 1][j + 1]) {
-						n++;
-					}
+				if (i - 1 >= 0 && j - 1 >= 0 && isMine[i - 1][j - 1]) {
+					n++;
+				}
+				if (j - 1 >= 0 && isMine[i][j - 1]) {
+					n++;
+				}
+				if (i + 1 <= COLS - 1 && j - 1 >= 0 && isMine[i + 1][j - 1]) {
+					n++;
+				}
+				if (i - 1 >= 0 && isMine[i - 1][j]) {
+					n++;
+				}
+				if (i + 1 <= COLS - 1 && isMine[i + 1][j]) {
+					n++;
+				}
+				if (i - 1 >= 0 && j + 1 <= ROWS - 1 && isMine[i - 1][j + 1]) {
+					n++;
+				}
+				if (j + 1 <= ROWS - 1 && isMine[i][j + 1]) {
+					n++;
+				}
+				if (i + 1 <= COLS - 1 && j + 1 <= ROWS - 1 && isMine[i + 1][j + 1]) {
+					n++;
 				}
 				
 				Place place = new Place(i, j);
@@ -84,7 +82,7 @@ public class World extends JPanel {
 				
 				countNum++;
 			}
-		}System.out.println(numMap);
+		}
 		
 		addListener();
 	}
@@ -94,9 +92,12 @@ public class World extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int col = e.getX() / BLOCK_SIZE;
-				int row = e.getY() / BLOCK_SIZE;System.out.println("col: " + col + ", row: " + row);
+				int row = e.getY() / BLOCK_SIZE;
 
-				numMap.get(new Place(col, row)).setUncovered(true);
+				Num n = numMap.get(new Place(col, row));
+				if (n != null) {
+					n.setUncovered(true);
+				}
 				repaint();
 			}
 		};
@@ -104,8 +105,15 @@ public class World extends JPanel {
 		this.addMouseListener(l);
 	}
 	
+	public void uncoverAllBlank(Num num, Graphics g) {
+		
+	}
+	
 	@Override
 	public void paint(Graphics g) {
+		g.setColor(new Color(200, 200, 200));
+		g.fillRect(0, 0, WIDTH, HEIGHT);
+		g.setColor(Color.BLACK);
 		for (int i = 1; i < ROWS; i++) {
 			g.drawLine(0, BLOCK_SIZE * i, WIDTH, BLOCK_SIZE * i);
 		}
@@ -118,11 +126,18 @@ public class World extends JPanel {
 			g.fillOval(mines[i].getCol() * BLOCK_SIZE, mines[i].getRow() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 		}
 		
-		g.setColor(Color.BLUE);
 		g.setFont(new Font(null, 0, 20));
 		for (Num num : nums) {
-			if (num.getNum() != 0 && num.isUncovered()) {
-				g.drawString(num.getNum()+"", num.getCol() * BLOCK_SIZE + 5, num.getRow() * BLOCK_SIZE + 18);
+			if (num.isUncovered()) {
+				g.setColor(Color.WHITE);
+				if (num.getNum() != 0) {
+					g.fillRect(num.getCol() * BLOCK_SIZE + 1, num.getRow() * BLOCK_SIZE + 1, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+					g.setColor(Color.BLUE);
+					g.drawString(num.getNum()+"", num.getCol() * BLOCK_SIZE + 5, num.getRow() * BLOCK_SIZE + 18);
+				} else {
+					g.fillRect(num.getCol() * BLOCK_SIZE + 1, num.getRow() * BLOCK_SIZE + 1, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+					
+				}
 			}
 		}
 	}
