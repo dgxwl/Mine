@@ -1,18 +1,13 @@
 package qwe;
 
 public class Num {
-	private int cols;
-	private int rows;
-	private int num;
-
-	public Num(int cols, int rows) {
-		this.cols = cols;
-		this.rows = rows;
-	}
 	
-	public Num(int cols, int rows, int num) {
-		this.cols = cols;
-		this.rows = rows;
+	private Place place;
+	private int num;
+	private boolean uncovered;
+
+	public Num(Place place, int num) {
+		this.place = place;
 		this.num = num;
 	}
 
@@ -23,26 +18,33 @@ public class Num {
 	public void setNum(int num) {
 		this.num = num;
 	}
-
-	public int getCols() {
-		return cols;
+	
+	public boolean isUncovered() {
+		return uncovered;
 	}
 
-	public void setCols(int cols) {
-		this.cols = cols;
+	public void setUncovered(boolean uncovered) {
+		this.uncovered = uncovered;
+	}
+	
+	public int getCol() {
+		return place.col;
 	}
 
-	public int getRows() {
-		return rows;
+	public void setCol(int col) {
+		place.col = col;
 	}
 
-	public void setRows(int rows) {
-		this.rows = rows;
+	public int getRow() {
+		return place.row;
+	}
+
+	public void setRow(int row) {
+		place.row = row;
 	}
 
 	@Override
 	public String toString() {
-		return "Num [cols=" + cols + ", rows=" + rows + ", num=" + num + "]";
+		return "num=" + num;
 	}
-
 }

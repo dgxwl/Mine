@@ -1,28 +1,26 @@
 package qwe;
 
 public class Mine {
-	private int cols;
-	private int rows;
+	
+	private Place place;
 
-	public Mine(int cols, int rows) {
-		this.cols = cols;
-		this.rows = rows;
+	public Mine(int col, int row) {
+		place = new Place(col, row);
 	}
 
-	public int getCols() {
-		return cols;
+	public int getCol() {
+		return place.col;
 	}
 
-	public void setCols(int cols) {
-		this.cols = cols;
+	public void setCol(int col) {
+		place.col = col;
 	}
 
-	public int getRows() {
-		return rows;
+	public int getRow() {
+		return place.row;
 	}
 
-	public void setRows(int rows) {
-		this.rows = rows;
+	public void setRow(int row) {
+		place.row = row;
 	}
-
 }

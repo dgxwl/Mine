@@ -3,7 +3,10 @@ package qwe;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.util.Arrays;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -23,6 +26,7 @@ public class World extends JPanel {
 	private Num[] nums = new Num[COLS * ROWS - MINE_NUM];
 	
 	private boolean[][] isMine = new boolean[COLS][ROWS];
+	private Map<Place, Num> numMap = new HashMap<>();
 	
 	public void start() {
 		Random random = new Random();
@@ -45,6 +49,7 @@ public class World extends JPanel {
 				if (isMine[i][j]) {
 					continue;
 				}
+				
 				int n = 0;
 				if (i - 1 >= 0 && i + 1 <= COLS - 1 && j - 1 >= 0 && j + 1 <= ROWS - 1) {
 					if (isMine[i - 1][j - 1]) {
@@ -73,10 +78,30 @@ public class World extends JPanel {
 					}
 				}
 				
-				nums[countNum] = new Num(i, j, n);
+				Place place = new Place(i, j);
+				nums[countNum] = new Num(place, n);
+				numMap.put(place, nums[countNum]);
+				
 				countNum++;
 			}
-		}
+		}System.out.println(numMap);
+		
+		addListener();
+	}
+	
+	public void addListener() {
+		MouseAdapter l = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int col = e.getX() / BLOCK_SIZE;
+				int row = e.getY() / BLOCK_SIZE;System.out.println("col: " + col + ", row: " + row);
+
+				numMap.get(new Place(col, row)).setUncovered(true);
+				repaint();
+			}
+		};
+		
+		this.addMouseListener(l);
 	}
 	
 	@Override
@@ -90,12 +115,15 @@ public class World extends JPanel {
 		
 		g.setColor(Color.GRAY);
 		for (int i = 0; i < mines.length; i++) {
-			g.fillOval(mines[i].getCols() * BLOCK_SIZE, mines[i].getRows() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+			g.fillOval(mines[i].getCol() * BLOCK_SIZE, mines[i].getRow() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 		}
+		
 		g.setColor(Color.BLUE);
 		g.setFont(new Font(null, 0, 20));
 		for (Num num : nums) {
-			g.drawString(num.getNum() == 0 ? "" : num.getNum()+"", num.getCols() * BLOCK_SIZE + 5, num.getRows() * BLOCK_SIZE + 18);
+			if (num.getNum() != 0 && num.isUncovered()) {
+				g.drawString(num.getNum()+"", num.getCol() * BLOCK_SIZE + 5, num.getRow() * BLOCK_SIZE + 18);
+			}
 		}
 	}
 	
