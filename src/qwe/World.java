@@ -105,8 +105,63 @@ public class World extends JPanel {
 		this.addMouseListener(l);
 	}
 	
-	public void uncoverAllBlank(Num num, Graphics g) {
-		
+	public void drawBlank(Num num, Graphics g) {
+		g.setColor(Color.WHITE);
+		if (num.getNum() != 0) {
+			g.fillRect(num.getCol() * BLOCK_SIZE + 1, num.getRow() * BLOCK_SIZE + 1, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+			g.setColor(Color.BLUE);
+			g.drawString(num.getNum()+"", num.getCol() * BLOCK_SIZE + 5, num.getRow() * BLOCK_SIZE + 18);
+		} else {
+			g.fillRect(num.getCol() * BLOCK_SIZE + 1, num.getRow() * BLOCK_SIZE + 1, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+			
+			Num topLeft = numMap.get(new Place(num.getCol() - 1, num.getRow() - 1));
+			if (topLeft != null && !topLeft.isUncovered()) {
+				topLeft.setUncovered(true);
+				drawBlank(topLeft, g);
+			}
+			
+			Num top = numMap.get(new Place(num.getCol(), num.getRow() - 1));
+			if (top != null && !top.isUncovered()) {
+				top.setUncovered(true);
+				drawBlank(top, g);
+			}
+			
+			Num topRight = numMap.get(new Place(num.getCol() + 1, num.getRow() - 1));
+			if (topRight != null && !topRight.isUncovered()) {
+				topRight.setUncovered(true);
+				drawBlank(topRight, g);
+			}
+			
+			Num left = numMap.get(new Place(num.getCol() - 1, num.getRow()));
+			if (left != null && !left.isUncovered()) {
+				left.setUncovered(true);
+				drawBlank(left, g);
+			}
+			
+			Num right = numMap.get(new Place(num.getCol() + 1, num.getRow()));
+			if (right != null && !right.isUncovered()) {
+				right.setUncovered(true);
+				drawBlank(right, g);
+			}
+			
+			Num bottomLeft = numMap.get(new Place(num.getCol() - 1, num.getRow() + 1));
+			if (bottomLeft != null && !bottomLeft.isUncovered()) {
+				bottomLeft.setUncovered(true);
+				drawBlank(bottomLeft, g);
+			}
+			
+			Num bottom = numMap.get(new Place(num.getCol(), num.getRow() + 1));
+			if (bottom != null && !bottom.isUncovered()) {
+				bottom.setUncovered(true);
+				drawBlank(bottom, g);
+			}
+			
+			Num bottomRight = numMap.get(new Place(num.getCol() + 1, num.getRow() + 1));
+			if (bottomRight != null && !bottomRight.isUncovered()) {
+				bottomRight.setUncovered(true);
+				drawBlank(bottomRight, g);
+			}
+		}
 	}
 	
 	@Override
@@ -129,15 +184,7 @@ public class World extends JPanel {
 		g.setFont(new Font(null, 0, 20));
 		for (Num num : nums) {
 			if (num.isUncovered()) {
-				g.setColor(Color.WHITE);
-				if (num.getNum() != 0) {
-					g.fillRect(num.getCol() * BLOCK_SIZE + 1, num.getRow() * BLOCK_SIZE + 1, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
-					g.setColor(Color.BLUE);
-					g.drawString(num.getNum()+"", num.getCol() * BLOCK_SIZE + 5, num.getRow() * BLOCK_SIZE + 18);
-				} else {
-					g.fillRect(num.getCol() * BLOCK_SIZE + 1, num.getRow() * BLOCK_SIZE + 1, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
-					
-				}
+				drawBlank(num, g);
 			}
 		}
 	}
