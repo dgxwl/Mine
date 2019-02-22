@@ -3,6 +3,7 @@ package qwe;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Polygon;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -26,17 +27,31 @@ public class World extends JPanel {
 	private Num[] nums = new Num[COLS * ROWS - MINE_NUM];
 	
 	private boolean[][] isMine = new boolean[COLS][ROWS];
+	private Place firstClickPlace;
 	private Map<Place, Num> numMap = new HashMap<>();
 	
+	private boolean firstClick = true;
+	private boolean isGameover = false;
+	
 	public void start() {
+		addListener();
+	}
+	
+	public void generate() {
 		Random random = new Random();
 		for (int i = 0; i < mines.length; i++) {
 			while (true) {
 				int c = random.nextInt(COLS);
 				int r = random.nextInt(ROWS);
+				
 				if (isMine[c][r]) {
 					continue;
 				}
+				
+				if (c == firstClickPlace.col && r == firstClickPlace.row) {
+					continue;
+				}
+				
 				mines[i] = new Mine(c, r);
 				isMine[c][r] = true;
 				break;
@@ -83,8 +98,6 @@ public class World extends JPanel {
 				countNum++;
 			}
 		}
-		
-		addListener();
 	}
 	
 	public void addListener() {
@@ -93,19 +106,31 @@ public class World extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				int col = e.getX() / BLOCK_SIZE;
 				int row = e.getY() / BLOCK_SIZE;
-
-				Num n = numMap.get(new Place(col, row));
-				if (n != null) {
-					n.setUncovered(true);
+				
+				if (firstClick) {
+					firstClickPlace = new Place(col, row);
+					generate();
+					firstClick = false;
 				}
-				repaint();
+				
+				if (!isGameover) {
+					if (isMine[col][row]) {
+						isGameover = true;
+					}
+					
+					Num n = numMap.get(new Place(col, row));
+					if (n != null) {
+						n.setUncovered(true);
+					}
+					repaint();
+				}
 			}
 		};
 		
 		this.addMouseListener(l);
 	}
 	
-	public void drawBlank(Num num, Graphics g) {
+	public void drawBlock(Num num, Graphics g) {
 		g.setColor(Color.WHITE);
 		if (num.getNum() != 0) {
 			g.fillRect(num.getCol() * BLOCK_SIZE + 1, num.getRow() * BLOCK_SIZE + 1, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
@@ -117,51 +142,62 @@ public class World extends JPanel {
 			Num topLeft = numMap.get(new Place(num.getCol() - 1, num.getRow() - 1));
 			if (topLeft != null && !topLeft.isUncovered()) {
 				topLeft.setUncovered(true);
-				drawBlank(topLeft, g);
+				drawBlock(topLeft, g);
 			}
 			
 			Num top = numMap.get(new Place(num.getCol(), num.getRow() - 1));
 			if (top != null && !top.isUncovered()) {
 				top.setUncovered(true);
-				drawBlank(top, g);
+				drawBlock(top, g);
 			}
 			
 			Num topRight = numMap.get(new Place(num.getCol() + 1, num.getRow() - 1));
 			if (topRight != null && !topRight.isUncovered()) {
 				topRight.setUncovered(true);
-				drawBlank(topRight, g);
+				drawBlock(topRight, g);
 			}
 			
 			Num left = numMap.get(new Place(num.getCol() - 1, num.getRow()));
 			if (left != null && !left.isUncovered()) {
 				left.setUncovered(true);
-				drawBlank(left, g);
+				drawBlock(left, g);
 			}
 			
 			Num right = numMap.get(new Place(num.getCol() + 1, num.getRow()));
 			if (right != null && !right.isUncovered()) {
 				right.setUncovered(true);
-				drawBlank(right, g);
+				drawBlock(right, g);
 			}
 			
 			Num bottomLeft = numMap.get(new Place(num.getCol() - 1, num.getRow() + 1));
 			if (bottomLeft != null && !bottomLeft.isUncovered()) {
 				bottomLeft.setUncovered(true);
-				drawBlank(bottomLeft, g);
+				drawBlock(bottomLeft, g);
 			}
 			
 			Num bottom = numMap.get(new Place(num.getCol(), num.getRow() + 1));
 			if (bottom != null && !bottom.isUncovered()) {
 				bottom.setUncovered(true);
-				drawBlank(bottom, g);
+				drawBlock(bottom, g);
 			}
 			
 			Num bottomRight = numMap.get(new Place(num.getCol() + 1, num.getRow() + 1));
 			if (bottomRight != null && !bottomRight.isUncovered()) {
 				bottomRight.setUncovered(true);
-				drawBlank(bottomRight, g);
+				drawBlock(bottomRight, g);
 			}
 		}
+	}
+	
+	public void drawFlag(Graphics g, int col, int row) {
+		g.setColor(Color.RED);
+		Polygon p = new Polygon();
+		p.addPoint(col * BLOCK_SIZE + BLOCK_SIZE/2, row * BLOCK_SIZE + 1);
+		p.addPoint(col * BLOCK_SIZE + BLOCK_SIZE/2, row * BLOCK_SIZE + BLOCK_SIZE/2);
+		p.addPoint(col * BLOCK_SIZE + BLOCK_SIZE - 1, row * BLOCK_SIZE + BLOCK_SIZE/2);
+		g.fillPolygon(p);
+		g.drawLine(col * BLOCK_SIZE + BLOCK_SIZE/2, row * BLOCK_SIZE + BLOCK_SIZE/2, 
+				col * BLOCK_SIZE + BLOCK_SIZE/2, row * BLOCK_SIZE + BLOCK_SIZE - 2);
 	}
 	
 	@Override
@@ -176,15 +212,19 @@ public class World extends JPanel {
 			g.drawLine(BLOCK_SIZE * i, 0, BLOCK_SIZE * i, HEIGHT);
 		}
 		
-		g.setColor(Color.GRAY);
-		for (int i = 0; i < mines.length; i++) {
-			g.fillOval(mines[i].getCol() * BLOCK_SIZE, mines[i].getRow() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+		if (isGameover) {
+			g.setColor(Color.GRAY);
+			for (int i = 0; i < mines.length; i++) {
+				g.fillOval(mines[i].getCol() * BLOCK_SIZE, mines[i].getRow() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+			}
 		}
 		
-		g.setFont(new Font(null, 0, 20));
-		for (Num num : nums) {
-			if (num.isUncovered()) {
-				drawBlank(num, g);
+		if (!firstClick) {
+			g.setFont(new Font(null, 0, 20));
+			for (Num num : nums) {
+				if (num.isUncovered()) {
+					drawBlock(num, g);
+				}
 			}
 		}
 	}
