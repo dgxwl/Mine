@@ -3,6 +3,7 @@ package qwe;
 public class Mine {
 	
 	private Place place;
+	private boolean flagged;
 
 	public Mine(int col, int row) {
 		place = new Place(col, row);
@@ -22,5 +23,13 @@ public class Mine {
 
 	public void setRow(int row) {
 		place.row = row;
+	}
+
+	public boolean isFlagged() {
+		return flagged;
+	}
+
+	public void setFlagged(boolean flagged) {
+		this.flagged = flagged;
 	}
 }

@@ -27,6 +27,7 @@ public class World extends JPanel {
 	private Num[] nums = new Num[COLS * ROWS - MINE_NUM];
 	
 	private boolean[][] isMine = new boolean[COLS][ROWS];
+	private boolean[][] isFlagged = new boolean[COLS][ROWS];
 	private Place firstClickPlace;
 	private Map<Place, Num> numMap = new HashMap<>();
 	
@@ -114,13 +115,23 @@ public class World extends JPanel {
 				}
 				
 				if (!isGameover) {
-					if (isMine[col][row]) {
-						isGameover = true;
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						if (isMine[col][row]) {
+							isGameover = true;
+						}
+						
+						Num n = numMap.get(new Place(col, row));
+						if (n != null) {
+							n.setUncovered(true);
+						}
 					}
 					
-					Num n = numMap.get(new Place(col, row));
-					if (n != null) {
-						n.setUncovered(true);
+					if (e.getButton() == MouseEvent.BUTTON3) {
+						if (!isFlagged[col][row]) {
+							isFlagged[col][row] = true;
+						} else {
+							isFlagged[col][row] = false;
+						}
 					}
 					repaint();
 				}
@@ -210,6 +221,14 @@ public class World extends JPanel {
 		}
 		for (int i = 1; i < COLS; i++) {
 			g.drawLine(BLOCK_SIZE * i, 0, BLOCK_SIZE * i, HEIGHT);
+		}
+		
+		for (int i = 0; i < isFlagged.length; i++) {
+			for (int j = 0; j < isFlagged[i].length; j++) {
+				if (isFlagged[i][j]) {
+					drawFlag(g, i, j);
+				}
+			}
 		}
 		
 		if (isGameover) {
