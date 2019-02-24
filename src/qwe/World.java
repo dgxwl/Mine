@@ -40,6 +40,7 @@ public class World extends JPanel {
 	}
 	
 	public void generate() {
+		//随机生成地雷
 		Random random = new Random();
 		for (int i = 0; i < mines.length; i++) {
 			while (true) {
@@ -60,6 +61,7 @@ public class World extends JPanel {
 			}
 		}
 		
+		//根据地雷的分布生成数字
 		int countNum = 0;
 		for (int i = 0; i < COLS; i++) {
 			for (int j = 0; j < ROWS; j++) {
@@ -155,6 +157,7 @@ public class World extends JPanel {
 		this.addMouseListener(l);
 	}
 	
+	//检查是否赢了
 	public void checkWin() {
 		int flaggedNum = 0;  //当前旗子个数
 		for (int i = 0; i < isFlagged.length; i++) {
@@ -167,7 +170,7 @@ public class World extends JPanel {
 					}
 				}
 			}
-		}System.out.println(flaggedNum);
+		}
 		
 		if (flaggedNum == MINE_NUM) {
 			for (Num num : nums) {  //所有雷已经标记了, 没翻开的数字自动翻开
@@ -179,6 +182,7 @@ public class World extends JPanel {
 		}
 	}
 	
+	//画已翻开的数字;如果是0,递归翻开周围格子
 	public void drawBlock(Num num, Graphics g) {
 		g.setColor(Color.WHITE);
 		if (num.getNum() != 0) {
@@ -238,6 +242,7 @@ public class World extends JPanel {
 		}
 	}
 	
+	//画旗子图案
 	public void drawFlag(Graphics g, int col, int row) {
 		g.setColor(Color.RED);
 		Polygon p = new Polygon();
