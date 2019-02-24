@@ -33,6 +33,7 @@ public class World extends JPanel {
 	
 	private boolean firstClick = true;
 	private boolean isGameover = false;
+	private boolean isWin = false;
 	
 	public void start() {
 		addListener();
@@ -114,10 +115,16 @@ public class World extends JPanel {
 					firstClick = false;
 				}
 				
-				if (!isGameover) {
+				if (!isGameover && !isWin) {
 					if (e.getButton() == MouseEvent.BUTTON1) {
+						if (isFlagged[col][row]) {
+							return ;
+						}
+						
 						if (isMine[col][row]) {
 							isGameover = true;
+							repaint();
+							return;
 						}
 						
 						Num n = numMap.get(new Place(col, row));
@@ -127,18 +134,49 @@ public class World extends JPanel {
 					}
 					
 					if (e.getButton() == MouseEvent.BUTTON3) {
-						if (!isFlagged[col][row]) {
+						Num n = numMap.get(new Place(col, row));
+						boolean isUncovered = false;
+						if (n != null) {
+							isUncovered = n.isUncovered();
+						}
+						if (!isUncovered && !isFlagged[col][row]) {
 							isFlagged[col][row] = true;
 						} else {
 							isFlagged[col][row] = false;
 						}
 					}
+					
+					checkWin();
 					repaint();
 				}
 			}
 		};
 		
 		this.addMouseListener(l);
+	}
+	
+	public void checkWin() {
+		int flaggedNum = 0;  //当前旗子个数
+		for (int i = 0; i < isFlagged.length; i++) {
+			for (int j = 0; j < isFlagged[i].length; j++) {
+				if (isFlagged[i][j]) {
+					if (!isMine[i][j]) {
+						return ;
+					} else {
+						flaggedNum++;
+					}
+				}
+			}
+		}System.out.println(flaggedNum);
+		
+		if (flaggedNum == MINE_NUM) {
+			for (Num num : nums) {  //所有雷已经标记了, 没翻开的数字自动翻开
+				if (!num.isUncovered()) {
+					num.setUncovered(true);
+				}
+			}
+			isWin = true;
+		}
 	}
 	
 	public void drawBlock(Num num, Graphics g) {
@@ -245,6 +283,12 @@ public class World extends JPanel {
 					drawBlock(num, g);
 				}
 			}
+		}
+		
+		if (isWin) {
+			g.setColor(Color.RED);
+			g.setFont(new Font(null, 0, 55));
+			g.drawString("Clear!", WIDTH / 2, HEIGHT / 2);
 		}
 	}
 	
